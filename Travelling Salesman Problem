@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAX 10
+
+int n;
+int dist[MAX][MAX];
+int visited[MAX];
+int minCost = INT_MAX;
+
+// Swap two integers
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Calculate cost of current path
+int calculateCost(int path[]) {
+    int cost = 0;
+    for (int i = 0; i < n - 1; i++)
+        cost += dist[path[i]][path[i + 1]];
+    cost += dist[path[n - 1]][path[0]]; // return to start
+    return cost;
+}
+
+// Generate all permutations and find minimum cost
+void tsp(int path[], int l, int r) {
+    if (l == r) {
+        int cost = calculateCost(path);
+        if (cost < minCost)
+            minCost = cost;
+    } else {
+        for (int i = l; i <= r; i++) {
+            swap(&path[l], &path[i]);
+            tsp(path, l + 1, r);
+            swap(&path[l], &path[i]); // backtrack
+        }
+    }
+}
+
+int main() {
+    printf("Enter number of cities: ");
+    scanf("%d", &n);
+
+    printf("Enter distance matrix:\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &dist[i][j]);
+
+    int path[MAX];
+    for (int i = 0; i < n; i++)
+        path[i] = i;
+
+    tsp(path, 1, n - 1); // start from city 0, fix it
+
+    printf("Minimum cost of TSP tour: %d\n", minCost);
+
+    return 0;
+}
